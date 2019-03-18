@@ -7,47 +7,48 @@ using namespace std;
 #include <thread>
 
 int mid[1000],vwap[1000];
-
+int begin=2;int end=::begin+1000;
 int main() {
-    auto Quote  = []() -> void {
-        ifstream trade("HSI.Quote.csv");
-        int begin=2;//int sk=begin;
-        while(!trade.eof()){
+
+    auto Quote  = [](Inthread& Qt,ifstream& quote) -> void {
+        int begin=::begin;
+        while(!quote.eof()){
             int end=begin+1000;
-            Inthread Tr(trade,begin,end,5);
             string **data = new string *[end - begin];
             for (int i = 0; i < (end - begin); i++) {
                 data[i] = new string[5];
             }
-            data= Tr.Reader(trade,begin,end,5);
-            mid[begin-2]=Tr.Mid(data,(end-begin-1));
-            if (begin==1002) break;
+            data= Qt.Reader(quote,begin,end,5);
+            mid[begin-::begin]=Qt.Mid(data,(end-begin-1));
+            if (begin==::end) break;
             begin++;
             delete data;
         }
 
     };
-    auto Trade = []() -> void {
-        ifstream trade("HSI.Trade.csv");
-        int begin=2;
+
+    auto Trade = [](Inthread& Tr,ifstream& trade) -> void {
+        int begin=::begin;
         while(!trade.eof()){
             int end=begin+1000;
-            Inthread Tr(trade,begin,end,3);
             string **data = new string *[end - begin];
-            for (int c = 0; c < (end - begin); c++) {
-                data[c] = new string[3];
+            for (int i = 0; i < (end - begin); i++) {
+                data[i] = new string[3];
             }
             data = Tr.Reader(trade,begin,end,3);
-            vwap[begin-2]= Tr.VWAP(data,begin,end);
-            if (begin==1002) break;
+            vwap[begin-::begin]= Tr.VWAP(data,begin,end);
+            if (begin==::end) break;
             begin++;
             delete data;
         }
 
     };
-
-    thread threadFirst( Quote );
-    thread threadSecond( Trade );
+    ifstream quote("HSI.Quote.csv");
+    Inthread Qt(quote);
+    ifstream trade("HSI.Trade.csv");
+    Inthread Tr(trade);
+    thread threadFirst( Quote,ref(Qt), ref(quote) );
+    thread threadSecond( Trade,ref(Tr), ref(trade) );
 
     threadFirst.join();
     threadSecond.join();
@@ -56,6 +57,8 @@ int main() {
         int dis=mid[i]-vwap[i];
         file<< dis<<endl;
     }
+    quote.close();
+    trade.close();
     file.close();
 
     return 0;

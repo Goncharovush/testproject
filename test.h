@@ -17,7 +17,7 @@ private:
         return file;
     }
 public:
-        Inthread(ifstream& filename, int begin, int end,int n) {}
+        Inthread(ifstream& filename) {}
 
         string** Reader(ifstream& filename, int begin, int end,int n){
             GotoLine(filename, begin);
