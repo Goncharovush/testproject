@@ -22,9 +22,8 @@ int main() {
             mid[begin-::begin]=Qt.Mid(data,(end-begin-1));
             if (begin==::end) break;
             begin++;
-            delete data;
         }
-
+        delete data;
     };
 
     auto Trade = [](Inthread& Tr,ifstream& trade) -> void {
@@ -40,11 +39,11 @@ int main() {
             if (begin==::end) break;
             begin++;
         }
-
+        delete data;
     };
-    ifstream quote("HSI.Quote.csv");
+    ifstream quote("//home//julia//HSI.Quote.csv");
     Inthread Qt(quote);
-    ifstream trade("HSI.Trade.csv");
+    ifstream trade("//home//julia//HSI.Trade.csv");
     Inthread Tr(trade);
     thread threadFirst( Quote,ref(Qt), ref(quote) );
     thread threadSecond( Trade,ref(Tr), ref(trade) );
